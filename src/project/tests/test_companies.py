@@ -9,10 +9,11 @@ class TestListCompanies(BaseTestCase):
     """List user companies"""
 
     def test_user_companies(self):
+        token = 'FAKE_TOKEN'
         with self.client:
             response = self.client.get(
                 '/companies',
-                # headers={'Authorization': 'Bearer {}'.format(token)},
+                headers={'Authorization': 'Bearer {}'.format(token)},
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
