@@ -1,9 +1,6 @@
 import json
 import unittest
 
-from project.tests.utils import random_string
-
-from project import db
 from project.tests.base import BaseTestCase
 from project.models import Company
 
