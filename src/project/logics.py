@@ -3,7 +3,8 @@ from project.serializers import CompanySerializer
 
 
 class CompanyLogics:
-    def list(self):
-        companies = Company.query.all()
+    def list_by_user(self, user):
+        companies = Company.query.join(Company.users, aliased=True)\
+                    .filter_by(user_id=user.id)
 
         return CompanySerializer.to_array(companies)

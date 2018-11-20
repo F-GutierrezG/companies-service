@@ -9,7 +9,7 @@ class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
-    user_companies = db.relationship("UserCompanies")
+    users = db.relationship("UserCompanies", backref='company')
 
 
 class UserCompanies(db.Model):

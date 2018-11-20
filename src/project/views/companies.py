@@ -10,7 +10,7 @@ companies_blueprint = Blueprint('companies', __name__)
 @companies_blueprint.route('/companies', methods=['GET'])
 @authenticate
 def list(user):
-    companies = CompanyLogics().list()
+    companies = CompanyLogics().list_by_user(user)
     return success_response(
         data=companies,
         status_code=200)

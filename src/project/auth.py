@@ -9,20 +9,6 @@ def forbidden(message='forbidden'):
     return jsonify({'message': message}), 403
 
 
-def parse_token(request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        return False
-
-    token_parts = auth_header.split(' ')
-
-    if len(token_parts) != 2:
-        return False
-
-    return token_parts[1]
-
-
 class User:
     def __init__(self, data):
         self.id = data['id']
@@ -31,50 +17,72 @@ class User:
         self.email = data['email']
 
 
-class FakeResponse:
-    def __init__(self, status_code):
-        self.status_code = status_code
+class Authenticator:
+    def authenticate(self, f, *args, **kwargs):
+        token = self.__parse_token()
+
+        if token is False:
+            return forbidden()
+
+        response, data = self.__do_request(token)
+        if response.status_code == 200:
+            user = User(data)
+            return f(user, *args, **kwargs)
+        else:
+            return forbidden()
+
+    def __do_request(self, token):
+        url = '{0}/auth/status'.format(current_app.config['USERS_SERVICE_URL'])
+        bearer = 'Bearer {0}'.format(token)
+        headers = {'Authorization': bearer}
+        response = requests.get(url, headers=headers)
+        data = json.loads(response.text)
+        return response, data
+
+    def __parse_token(self):
+        auth_header = request.headers.get('Authorization')
+
+        if not auth_header:
+            return False
+
+        token_parts = auth_header.split(' ')
+
+        if len(token_parts) != 2:
+            return False
+
+        return token_parts[1]
 
 
-def authenticate_mock():
-    return {
-        'id': 1,
-        'first_name': 'Francisco',
-        'last_name': 'Gutiérrez',
-        'email': 'valid@test.com'
-    }
+class MockAuthenticator:
+    instance = None
+
+    def __init__(self):
+        self.user = None
+
+    @staticmethod
+    def get_instance():
+        if MockAuthenticator.instance is None:
+            MockAuthenticator.instance = MockAuthenticator()
+        return MockAuthenticator.instance
+
+    def authenticate(self, f, *args, **kwargs):
+        return f(self.user, *args, **kwargs)
+
+    def set_user(self, user_data):
+        self.user = User(user_data)
 
 
-def authenticate_production(token):
-    url = '{0}/auth/status'.format(current_app.config['USERS_SERVICE_URL'])
-    bearer = 'Bearer {0}'.format(token)
-    headers = {'Authorization': bearer}
-    response = requests.get(url, headers=headers)
-    data = json.loads(response.text)
-    return response, data
-
-
-def do_authenticate(f, *args, **kwargs):
-    token = parse_token(request)
-
-    if token is False:
-        return forbidden()
-
-    response, data = authenticate_production(token)
-    if response.status_code == 200:
-        user = User(data)
-        return f(user, *args, **kwargs)
-    else:
-        return forbidden()
+class AuthenticatorFactory:
+    @staticmethod
+    def get_instance():
+        if current_app.config['USERS_SERVICE_MOCK']:
+            return MockAuthenticator.get_instance()
+        return Authenticator()
 
 
 def authenticate(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_app.config['USERS_SERVICE_MOCK']:
-            user = authenticate_mock()
-            return f(user, *args, **kwargs)
-
-        else:
-            return do_authenticate(f, *args, **kwargs)
+        return AuthenticatorFactory.get_instance().authenticate(
+            f, *args, **kwargs)
     return decorated_function
