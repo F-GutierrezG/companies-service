@@ -10,9 +10,11 @@ migrate = Migrate()
 
 
 def register_blueprints(app):
-    # from project.api.health import health_blueprint
+    from project.views.health import health_blueprint
+    from project.views.companies import companies_blueprint
 
-    # app.register_blueprint(health_blueprint)
+    app.register_blueprint(health_blueprint)
+    app.register_blueprint(companies_blueprint)
     pass
 
 
