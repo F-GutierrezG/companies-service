@@ -7,6 +7,9 @@ RUN apt-get update && \
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+ARG USERS_SERVICE_URL
+ENV USERS_SERVICE_URL $USERS_SERVICE_URL
+
 COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
