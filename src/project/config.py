@@ -18,7 +18,7 @@ class DevelopmentConfig(BaseConfig):
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_ECHO = True
-    USERS_SERVICE_MOCK = False
+    USERS_SERVICE_MOCK = True
 
 
 class TestingConfig(BaseConfig):

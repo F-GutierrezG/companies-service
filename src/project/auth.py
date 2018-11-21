@@ -1,8 +1,7 @@
-import json
-import requests
-
 from functools import wraps
 from flask import request, jsonify, current_app
+
+from project.services import AuthService
 
 
 def forbidden(message='forbidden'):
@@ -32,12 +31,7 @@ class Authenticator:
             return forbidden()
 
     def __do_request(self, token):
-        url = '{0}/auth/status'.format(current_app.config['USERS_SERVICE_URL'])
-        bearer = 'Bearer {0}'.format(token)
-        headers = {'Authorization': bearer}
-        response = requests.get(url, headers=headers)
-        data = json.loads(response.text)
-        return response, data
+        return AuthService().status(token)
 
     def __parse_token(self):
         auth_header = request.headers.get('Authorization')

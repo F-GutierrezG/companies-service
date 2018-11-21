@@ -29,7 +29,7 @@ class TestDevelopmentConfig(TestCase):
             app.config['SQLALCHEMY_DATABASE_URI'],
             os.environ.get('DATABASE_URL'))
         self.assertTrue(app.config['SQLALCHEMY_ECHO'])
-        self.assertFalse(app.config['USERS_SERVICE_MOCK'])
+        self.assertTrue(app.config['USERS_SERVICE_MOCK'])
 
 
 class TestTestingConfig(TestCase):
