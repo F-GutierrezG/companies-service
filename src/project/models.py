@@ -5,6 +5,7 @@ class Company(db.Model):
     NAME_MAX_LENGTH = 128
 
     __tablename__ = 'companies'
+    __table_args__ = {'schema': 'companies'}
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False)
@@ -14,10 +15,11 @@ class Company(db.Model):
 
 class UserCompanies(db.Model):
     __tablename__ = 'user_companies'
+    __table_args__ = {'schema': 'companies'}
 
     user_id = db.Column(db.Integer, primary_key=True, nullable=False)
     company_id = db.Column(
         db.Integer,
-        db.ForeignKey('companies.id'),
+        db.ForeignKey(Company.id),
         primary_key=True,
         nullable=False)
