@@ -22,7 +22,7 @@ services:
       - companies-db
     networks:
       - companies-service-network
-      - client-network
+      - onelike-network
 
   companies-db:
     container_name: companies-db
@@ -50,10 +50,10 @@ services:
       - API_URL=definitions/swagger.yml
     networks:
       - companies-service-network
-      - client-network
+      - onelike-network
 
 networks:
   companies-service-network:
     name: companies-service-network
-  client-network:
-    name: client-network
+  onelike-network:
+    name: onelike-network
