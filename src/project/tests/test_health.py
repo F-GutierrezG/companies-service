@@ -3,7 +3,7 @@ import unittest
 from project.tests.base import BaseTestCase
 
 
-class TestUserServiceHealth(BaseTestCase):
+class TestCompaniesServiceHealth(BaseTestCase):
     """Tests for health of CompaniesService"""
 
     def test_health(self):

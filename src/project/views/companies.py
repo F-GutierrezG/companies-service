@@ -16,6 +16,15 @@ def list(user):
         status_code=200)
 
 
+@companies_blueprint.route('/companies/users', methods=['GET'])
+@authenticate
+def list_users(user):
+    users = UserLogics().list_users(user)
+    return success_response(
+        data=users,
+        status_code=200)
+
+
 @companies_blueprint.route('/companies/<id>/users', methods=['GET'])
 @authenticate
 def users(user, id):
