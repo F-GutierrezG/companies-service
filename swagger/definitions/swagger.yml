@@ -92,7 +92,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Company"
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/Forbidden"
+        '404':
+          description: Company not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/NotFound"
+  /companies/users:
+    get:
+      tags:
+        - Companies
+      summary: Get Company users
+      description: Get Company users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Company id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Company Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
         '403':
           description: Forbidden.
           content:
@@ -133,6 +172,24 @@ components:
         message:
           type: string
           description: Health status
+    User:
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User id
+        first_name:
+          type: string
+          description: User first name
+        last_name:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email
+        admin:
+          type: bool
+          description: User is admin
   responses:
     BadRequest:
       properties:
