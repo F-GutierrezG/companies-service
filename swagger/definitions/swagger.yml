@@ -164,6 +164,9 @@ components:
           type: integer
           format: int64
           description: Company id
+        identifier:
+          type: string
+          description: Company national identifier
         name:
           type: string
           description: Company name

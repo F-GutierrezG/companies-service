@@ -3,6 +3,7 @@ class CompanySerializer:
     def to_dict(company):
         return {
             'id': company.id,
+            'identifier': company.identifier,
             'name': company.name,
         }
 

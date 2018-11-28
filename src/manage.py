@@ -40,6 +40,12 @@ def seed_db():
 
 
 @cli.command()
+def clean_db():
+    db.drop_all()
+    db.session.commit()
+
+
+@cli.command()
 @click.option('--file', default=None)
 def test(file):
     """Runs the tests without code coverage"""
