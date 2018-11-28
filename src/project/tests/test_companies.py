@@ -206,6 +206,91 @@ class TestCreateCompany(BaseTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertEqual(Company.query.count(), 0)
 
+    def test_create_a_company_without_identifier(self):
+        """Test creating a company without identifier"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        data = {
+            'identifier': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 0)
+
+    def test_create_a_company_without_name(self):
+        """Test creating a company without name"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        data = {
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 0)
+
+    def test_create_a_company_with_empty_data(self):
+        """Test creating a company without name"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        data = {}
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 0)
+
+    def test_create_a_company_without_data(self):
+        """Test creating a company without name"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

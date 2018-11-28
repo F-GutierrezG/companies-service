@@ -1,8 +1,10 @@
 from flask import Blueprint, request
+
 from auth.decorators import authenticate
+from validators.exceptions import ValidatorException
+
 from project.logics import CompanyLogics, UserLogics, NotFound, Forbidden
 from project.views.utils import success_response, failed_response
-from project.validators.exceptions import ValidatorException
 
 
 companies_blueprint = Blueprint('companies', __name__)

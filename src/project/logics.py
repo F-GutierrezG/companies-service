@@ -1,7 +1,10 @@
 from sqlalchemy.sql.expression import true
 
-from project.models import Company, UserCompanies
 from users_service.factories import UsersServiceFactory
+from validators.decorators import validate
+
+from project.validations import CompanyValidator
+from project.models import Company, UserCompanies
 from project.serializers import CompanySerializer
 from project import db
 
@@ -39,6 +42,7 @@ class CompanyLogics:
 
         return CompanySerializer.to_array(companies)
 
+    @validate(CompanyValidator)
     def create(self, user, data):
         if not user.admin:
             raise Forbidden

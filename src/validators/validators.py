@@ -1,5 +1,4 @@
-from project.validators.exceptions import ValidationRuleException
-from project.validators.exceptions import ValidatorException
+from .exceptions import ValidationRuleException, ValidatorException
 
 
 class BaseValidator:

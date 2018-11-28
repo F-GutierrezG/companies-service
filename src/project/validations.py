@@ -1,30 +1,20 @@
-from project.validators import BaseValidator
-from project.validators import rules
-from project.models import User
+from validators import BaseValidator
+from validators import rules
+from project.models import Company
 
 
-class UpdateUserValidator(BaseValidator):
+class CompanyValidator(BaseValidator):
     def get_rules(self):
         return {
-            'first_name': [
+            'identifier': [
                 rules.Required(),
-                rules.Length(max=User.FIRST_NAME_MAX_LENGTH)
+                rules.Length(max=Company.IDENTIFIER_MAX_LENGTH)
             ],
-            'last_name': [
+            'name': [
                 rules.Required(),
-                rules.Length(max=User.LAST_NAME_MAX_LENGTH)
-            ],
-            'email': [rules.Required()],
+                rules.Length(max=Company.NAME_MAX_LENGTH)
+            ]
         }
-
-
-class CreateUserValidator(UpdateUserValidator):
-    def get_rules(self):
-        new_rules = super().get_rules()
-
-        new_rules['password'] = [rules.Required()]
-
-        return new_rules
 
 
 class LoginValidator(BaseValidator):

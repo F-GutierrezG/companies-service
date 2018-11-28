@@ -55,6 +55,8 @@ class MockAuthenticator:
         return self
 
     def authenticate(self, f, *args, **kwargs):
+        if self.user is None:
+            return forbidden()
         return f(self.user, *args, **kwargs)
 
     def set_user(self, user_data):
