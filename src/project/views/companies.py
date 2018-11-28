@@ -27,6 +27,8 @@ def view(user, id):
         return success_response(
             data=company,
             status_code=200)
+    except Forbidden:
+        return failed_response('forbidden.', 403)
     except NotFound:
         return failed_response(message='not found.', status_code=404)
 
@@ -62,6 +64,24 @@ def create(user):
         return success_response(
             data=company,
             status_code=201)
+    except Forbidden:
+        return failed_response('forbidden.', 403)
+    except ValidatorException as e:
+        return failed_response('invalid payload.', 400, e.errors)
+
+
+@companies_blueprint.route('/companies/<id>', methods=['PUT'])
+@authenticate
+def update(user, id):
+    company_data = request.get_json()
+
+    try:
+        company = CompanyLogics().update(user, id, company_data)
+        return success_response(
+            data=company,
+            status_code=200)
+    except NotFound:
+        return failed_response('not found.', 404)
     except Forbidden:
         return failed_response('forbidden.', 403)
     except ValidatorException as e:

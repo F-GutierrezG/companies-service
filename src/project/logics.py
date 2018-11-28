@@ -18,19 +18,20 @@ class Forbidden(Exception):
 
 
 class CompanyLogics:
-    def __belongs_to_company(self, user, id):
+    def __belongs_to_company(self, user, company):
         user_company = UserCompanies.query.filter_by(
             user_id=user.id,
-            company_id=id).first()
+            company_id=company.id).first()
         return user_company is not None
 
     def get(self, user, id):
-        company = None
-        if user.admin or self.__belongs_to_company(user, id):
-            company = Company.query.filter_by(id=id).first()
+        company = Company.query.filter_by(id=id, active=True).first()
 
         if company is None:
             raise NotFound
+
+        if not user.admin and not self.__belongs_to_company(user, company):
+            raise Forbidden
 
         return CompanySerializer.to_dict(company)
 
@@ -54,6 +55,18 @@ class CompanyLogics:
         db.session.commit()
 
         return CompanySerializer.to_dict(company)
+
+    @validate(CompanyValidator)
+    def update(self, user, id, data):
+        company = Company.query.filter_by(id=id, active=True).first()
+        if not user.admin and not self.__belongs_to_company(user, company):
+            raise Forbidden
+
+        data['updated_by'] = user.id
+        Company.query.filter_by(id=id, active=True).update(data)
+        db.session.commit()
+
+        return self.get(user, id)
 
 
 class UserLogics:

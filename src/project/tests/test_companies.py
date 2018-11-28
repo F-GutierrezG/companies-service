@@ -147,7 +147,7 @@ class TestViewCompany(BaseTestCase):
             )
 
             self.assertEqual(Company.query.count(), 1)
-            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.status_code, 403)
 
 
 class TestCreateCompany(BaseTestCase):
@@ -290,6 +290,183 @@ class TestCreateCompany(BaseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertEqual(Company.query.count(), 0)
+
+
+class TestUpdateCompany(BaseTestCase):
+    """Test Update Company"""
+
+    def test_admin_users_can_update_companies(self):
+        """Test admin users can update companies"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        company = add_company()
+
+        data = {
+            'identifier': random_string(),
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            response_data = json.loads(response.data.decode())
+
+            updated_company = Company.query.first()
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertEqual(response_data['identifier'], data['identifier'])
+            self.assertEqual(response_data['name'], data['name'])
+            self.assertIsNotNone(updated_company.updated)
+            self.assertEqual(updated_company.updated_by, admin['id'])
+
+    def test_not_admin_users_cant_update_companies(self):
+        """Test not admin users can't update companies"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        user = add_user(admin=False)
+        auth.set_user(user)
+
+        data = {
+            'identifier': random_string(),
+            'name': random_string()
+        }
+
+        company = add_company()
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            company = Company.query.filter_by(id=company.id).first()
+
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertNotEqual(company.identifier, data['identifier'])
+            self.assertNotEqual(company.name, data['name'])
+
+    def test_update_a_company_without_identifier(self):
+        """Test update a company without identifier"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        company = add_company()
+
+        data = {
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            company = Company.query.filter_by(id=company.id).first()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertIsNotNone(company.identifier)
+            self.assertNotEqual(company.name, data['name'])
+
+    def test_update_a_company_without_name(self):
+        """Test update a company without name"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        company = add_company()
+
+        data = {
+            'identifier': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            company = Company.query.filter_by(id=company.id).first()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertIsNotNone(company.name)
+            self.assertNotEqual(company.identifier, data['identifier'])
+
+    def test_update_a_company_with_empty_data(self):
+        """Test update a company with empty data"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        company = add_company()
+
+        data = {}
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            company = Company.query.filter_by(id=company.id).first()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertIsNotNone(company.name)
+            self.assertIsNotNone(company.identifier)
+
+    def test_update_a_company_without_data(self):
+        """Test update a company without data"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        company = add_company()
+
+        self.assertEqual(Company.query.count(), 1)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                content_type='application/json'
+            )
+
+            company = Company.query.filter_by(id=company.id).first()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertIsNotNone(company.name)
+            self.assertIsNotNone(company.identifier)
 
 
 if __name__ == '__main__':
