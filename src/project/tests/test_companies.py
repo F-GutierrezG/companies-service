@@ -3,7 +3,8 @@ import random
 import unittest
 from auth.factories import AuthenticatorFactory
 
-from project.tests.utils import random_string, add_user, add_user_to_company
+from project.tests.utils import (
+    random_string, add_user, add_company, add_user_to_company)
 
 from project import db
 from project.tests.base import BaseTestCase
@@ -12,7 +13,9 @@ from project.models import Company, UserCompanies
 
 class BaseCompanyTestCase(BaseTestCase):
     def _add_company(self, users):
-        company = Company(name=random_string(16))
+        company = Company(
+            identifier=random_string(),
+            name=random_string())
         for user in users:
             company.users.append(UserCompanies(user_id=user))
         db.session.add(company)
@@ -71,17 +74,9 @@ class TestListCompanies(BaseCompanyTestCase):
 class TestViewCompany(BaseTestCase):
     """View company"""
 
-    def _create_company(self):
-        company = Company(name=random_string())
-
-        db.session.add(company)
-        db.session.commit()
-
-        return company
-
     def test_view_company_if_admin(self):
         """View a company as admin user"""
-        company = self._create_company()
+        company = add_company()
 
         admin = add_user(admin=True)
         auth = AuthenticatorFactory.get_instance().clear()
@@ -117,7 +112,7 @@ class TestViewCompany(BaseTestCase):
 
     def test_view_company_if_user_belongs(self):
         """View a company as a company user"""
-        company = self._create_company()
+        company = add_company()
         user = add_user()
         add_user_to_company(user, company)
 
@@ -138,7 +133,7 @@ class TestViewCompany(BaseTestCase):
 
     def test_view_company_if_user_not_belongs(self):
         """View a company as a not company user"""
-        company = self._create_company()
+        company = add_company()
         user = add_user()
 
         auth = AuthenticatorFactory.get_instance().clear()

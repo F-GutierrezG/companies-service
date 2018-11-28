@@ -4,7 +4,7 @@ import string
 from users_service.factories import UsersServiceFactory
 
 from project import db
-from project.models import UserCompanies
+from project.models import Company, UserCompanies
 
 
 def random_string(length=32):
@@ -26,6 +26,17 @@ def add_user(admin=False):
     }
     users_service.add_user(user)
     return user
+
+
+def add_company():
+    company = Company(
+        identifier=random_string(),
+        name=random_string())
+
+    db.session.add(company)
+    db.session.commit()
+
+    return company
 
 
 def add_user_to_company(user, company):

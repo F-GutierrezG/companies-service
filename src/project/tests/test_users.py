@@ -5,24 +5,16 @@ import unittest
 from auth.factories import AuthenticatorFactory
 from users_service.factories import UsersServiceFactory
 
-from project.tests.utils import random_string, add_user
+from project.tests.utils import random_string, add_user, add_company
 
 from project import db
-from project.models import Company, UserCompanies
+from project.models import UserCompanies
 
 from project.tests.base import BaseTestCase
 
 
 class TestListUsers(BaseTestCase):
     """Tests for list users"""
-
-    def _add_company(self):
-        company = Company(name=random_string())
-
-        db.session.add(company)
-        db.session.commit()
-
-        return company
 
     def _add_user_to_company(self, user, company):
         user_company = UserCompanies(user_id=user['id'], company_id=company.id)
@@ -66,7 +58,7 @@ class TestListUsers(BaseTestCase):
         admin = add_user(admin=True)
         authenticator.set_user(admin)
 
-        company = self._add_company()
+        company = add_company()
 
         users_quantity = random.randint(4, 10)
 
@@ -93,7 +85,7 @@ class TestListUsers(BaseTestCase):
         admin = add_user(admin=True)
         authenticator.set_user(admin)
 
-        company = self._add_company()
+        company = add_company()
 
         users_quantity = random.randint(4, 10)
 
@@ -120,7 +112,7 @@ class TestListUsers(BaseTestCase):
         current_user = add_user()
         authenticator.set_user(current_user)
 
-        company = self._add_company()
+        company = add_company()
 
         self._add_user_to_company(current_user, company)
 
@@ -149,7 +141,7 @@ class TestListUsers(BaseTestCase):
         current_user = add_user()
         authenticator.set_user(current_user)
 
-        company = self._add_company()
+        company = add_company()
 
         users_quantity = random.randint(4, 10)
 
