@@ -1,3 +1,4 @@
+from sqlalchemy.sql import func
 from project import db
 
 
@@ -12,6 +13,10 @@ class Company(db.Model):
     identifier = db.Column(db.String(IDENTIFIER_MAX_LENGTH), nullable=False)
     name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
+    created = db.Column(db.DateTime, default=func.now(), nullable=False)
+    created_by = db.Column(db.Integer, default=0, nullable=False)
+    updated = db.Column(db.DateTime, onupdate=func.now(), nullable=True)
+    updated_by = db.Column(db.Integer)
     users = db.relationship("UserCompanies", backref='company')
 
 

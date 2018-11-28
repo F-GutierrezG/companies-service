@@ -150,5 +150,62 @@ class TestViewCompany(BaseTestCase):
             self.assertEqual(response.status_code, 404)
 
 
+class TestCreateCompany(BaseTestCase):
+    """Test Create Company"""
+
+    def test_admin_users_can_create_companies(self):
+        """Test admin users can create companies"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        data = {
+            'identifier': random_string(),
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            response_data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(Company.query.count(), 1)
+            self.assertEqual(response_data['identifier'], data['identifier'])
+            self.assertEqual(response_data['name'], data['name'])
+            self.assertEqual(Company.query.first().created_by, admin['id'])
+
+    def test_not_admin_users_cant_create_companies(self):
+        """Test not admin users can't create companies"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        user = add_user(admin=False)
+        auth.set_user(user)
+
+        data = {
+            'identifier': random_string(),
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.post(
+                '/companies',
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(Company.query.count(), 0)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -3,9 +3,14 @@ from sqlalchemy.sql.expression import true
 from project.models import Company, UserCompanies
 from users_service.factories import UsersServiceFactory
 from project.serializers import CompanySerializer
+from project import db
 
 
-class DoesNotExist(Exception):
+class NotFound(Exception):
+    pass
+
+
+class Forbidden(Exception):
     pass
 
 
@@ -22,7 +27,7 @@ class CompanyLogics:
             company = Company.query.filter_by(id=id).first()
 
         if company is None:
-            raise DoesNotExist
+            raise NotFound
 
         return CompanySerializer.to_dict(company)
 
@@ -33,6 +38,18 @@ class CompanyLogics:
                         Company.active == true())
 
         return CompanySerializer.to_array(companies)
+
+    def create(self, user, data):
+        if not user.admin:
+            raise Forbidden
+
+        data['created_by'] = user.id
+        company = Company(**data)
+
+        db.session.add(company)
+        db.session.commit()
+
+        return CompanySerializer.to_dict(company)
 
 
 class UserLogics:
@@ -68,7 +85,7 @@ class UserLogics:
         company = Company.query.get(id)
 
         if company is None:
-            raise DoesNotExist
+            raise NotFound
 
         for user in company.users:
             users_ids.append(user.user_id)

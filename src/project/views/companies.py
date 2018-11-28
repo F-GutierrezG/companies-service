@@ -1,7 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from auth.decorators import authenticate
-from project.logics import CompanyLogics, UserLogics, DoesNotExist
+from project.logics import CompanyLogics, UserLogics, NotFound, Forbidden
 from project.views.utils import success_response, failed_response
+from project.validators.exceptions import ValidatorException
 
 
 companies_blueprint = Blueprint('companies', __name__)
@@ -24,7 +25,7 @@ def view(user, id):
         return success_response(
             data=company,
             status_code=200)
-    except DoesNotExist:
+    except NotFound:
         return failed_response(message='not found.', status_code=404)
 
 
@@ -45,5 +46,21 @@ def users(user, id):
         return success_response(
             data=users,
             status_code=200)
-    except DoesNotExist:
+    except NotFound:
         return failed_response(message='not found.', status_code=404)
+
+
+@companies_blueprint.route('/companies', methods=['POST'])
+@authenticate
+def create(user):
+    company_data = request.get_json()
+
+    try:
+        company = CompanyLogics().create(user, company_data)
+        return success_response(
+            data=company,
+            status_code=201)
+    except Forbidden:
+        return failed_response('forbidden.', 403)
+    except ValidatorException as e:
+        return failed_response('invalid payload.', 400, e.errors)
