@@ -167,6 +167,23 @@ class TestListUsers(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response_data), 0)
 
+    def test_list_users_on_an_unexisting_company(self):
+        """List users on an unexisting company"""
+        users_service = UsersServiceFactory.get_instance()
+        users_service.clear()
+        authenticator = AuthenticatorFactory.get_instance()
+
+        admin = add_user(admin=True)
+        authenticator.set_user(admin)
+
+        response = self.client.get(
+            '/companies/{}/users'.format(random.randint(1, 10)),
+            headers={'Authorization': 'Bearer {}'.format(random_string())},
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
