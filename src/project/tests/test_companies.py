@@ -1,13 +1,13 @@
 import json
+import random
 import unittest
+from auth.factories import AuthenticatorFactory
 
-from project.tests.utils import random_string
+from project.tests.utils import random_string, add_user, add_user_to_company
 
 from project import db
 from project.tests.base import BaseTestCase
 from project.models import Company, UserCompanies
-from project.auth import AuthenticatorFactory
-from project.services import UsersServiceMock
 
 
 class BaseCompanyTestCase(BaseTestCase):
@@ -69,49 +69,90 @@ class TestListCompanies(BaseCompanyTestCase):
 
 
 class TestViewCompany(BaseTestCase):
-    """View user companies"""
-    pass
+    """View company"""
 
+    def _create_company(self):
+        company = Company(name=random_string())
 
-class TestListCompanyUsers(BaseCompanyTestCase):
-    """List only company users"""
+        db.session.add(company)
+        db.session.commit()
 
-    def __get_company_users_ids(self, id):
-        users_ids = []
-        for user in Company.query.get(id).users:
-            users_ids.append(user.user_id)
-        return users_ids
+        return company
 
-    def test_list_only_company_users(self):
-        company1 = self._add_company(users=[1, 2, 3])
-        company2 = self._add_company(users=[3, 4])
+    def test_view_company_if_admin(self):
+        """View a company as admin user"""
+        company = self._create_company()
 
-        self.assertEqual(len(UserCompanies.query.all()), 5)
+        admin = add_user(admin=True)
+        auth = AuthenticatorFactory.get_instance().clear()
+        auth.set_user(admin)
 
-        token = 'FAKE_TOKEN'
         with self.client:
-            UsersServiceMock.get_instance().set_users([
-                {'id': 1}, {'id': 2}, {'id': 3}])
-
             response = self.client.get(
-                '/companies/{}/users'.format(company1.id),
-                headers={'Authorization': 'Bearer {}'.format(token)},
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(len(response_data), 3)
 
-            UsersServiceMock.get_instance().set_users([
-                {'id': 3}, {'id': 4}])
+            self.assertEqual(Company.query.count(), 1)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response_data['name'], company.name)
+
+    def test_view_unexisting_company_if_admin(self):
+        """View a company as admin user"""
+        admin = add_user(admin=True)
+        auth = AuthenticatorFactory.get_instance().clear()
+        auth.set_user(admin)
+
+        with self.client:
             response = self.client.get(
-                '/companies/{}/users'.format(company2.id),
-                headers={'Authorization': 'Bearer {}'.format(token)},
+                '/companies/{}'.format(random.randint(1, 100)),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                content_type='application/json'
+            )
+
+            self.assertEqual(Company.query.count(), 0)
+            self.assertEqual(response.status_code, 404)
+
+    def test_view_company_if_user_belongs(self):
+        """View a company as a company user"""
+        company = self._create_company()
+        user = add_user()
+        add_user_to_company(user, company)
+
+        auth = AuthenticatorFactory.get_instance().clear()
+        auth.set_user(user)
+
+        with self.client:
+            response = self.client.get(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
+
+            self.assertEqual(Company.query.count(), 1)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(len(response_data), 2)
+            self.assertEqual(response_data['name'], company.name)
+
+    def test_view_company_if_user_not_belongs(self):
+        """View a company as a not company user"""
+        company = self._create_company()
+        user = add_user()
+
+        auth = AuthenticatorFactory.get_instance().clear()
+        auth.set_user(user)
+
+        with self.client:
+            response = self.client.get(
+                '/companies/{}'.format(company.id),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                content_type='application/json'
+            )
+
+            self.assertEqual(Company.query.count(), 1)
+            self.assertEqual(response.status_code, 404)
 
 
 if __name__ == '__main__':

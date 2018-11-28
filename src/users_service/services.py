@@ -4,23 +4,6 @@ import requests
 from flask import request, current_app
 
 
-class AuthService:
-    def status(self, token):
-        url = '{0}/auth/status'.format(current_app.config['USERS_SERVICE_URL'])
-        bearer = request.headers.get('Authorization')
-        headers = {'Authorization': bearer}
-        response = requests.get(url, headers=headers)
-        data = json.loads(response.text)
-        return response, data
-
-
-class UsersServiceFactory:
-    def get_instance():
-        if current_app.config['USERS_SERVICE_MOCK']:
-            return UsersServiceMock.get_instance()
-        return UsersService()
-
-
 class UsersService:
     def filter_by_ids(self, ids=[]):
         url = '{0}/users/{1}'.format(

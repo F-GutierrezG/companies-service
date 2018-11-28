@@ -1,7 +1,7 @@
 from sqlalchemy.sql.expression import true
 
 from project.models import Company, UserCompanies
-from project.services import UsersServiceFactory
+from users_service.factories import UsersServiceFactory
 from project.serializers import CompanySerializer
 
 
@@ -10,6 +10,22 @@ class DoesNotExist(Exception):
 
 
 class CompanyLogics:
+    def __belongs_to_company(self, user, id):
+        user_company = UserCompanies.query.filter_by(
+            user_id=user.id,
+            company_id=id).first()
+        return user_company is not None
+
+    def get(self, user, id):
+        company = None
+        if user.admin or self.__belongs_to_company(user, id):
+            company = Company.query.filter_by(id=id).first()
+
+        if company is None:
+            raise DoesNotExist
+
+        return CompanySerializer.to_dict(company)
+
     def list_by_user(self, user):
         companies = Company.query.join(Company.users, aliased=True)\
                     .filter(
