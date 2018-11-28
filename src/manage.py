@@ -33,7 +33,7 @@ def recreate_db():
 
 @cli.command()
 def seed_db():
-    company = Company(name="Compañia 1")
+    company = Company(identifier="1", name="Compañia 1")
     company.users.append(UserCompanies(user_id=1))
     db.session.add(company)
     db.session.commit()
