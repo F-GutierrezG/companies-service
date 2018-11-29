@@ -73,7 +73,7 @@ paths:
       tags:
         - Companies
       summary: Get Company
-      description: Get Company by user Token
+      description: Get a Company
       security:
         - bearerAuth: []
       parameters:
@@ -87,6 +87,81 @@ paths:
       responses:
         '200':
           description: Company Get
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Company"
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/Forbidden"
+        '404':
+          description: Company not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/NotFound"
+    put:
+      tags:
+        - Companies
+      summary: Update Company
+      description: Update a Company
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Company data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/CompanyCreate'
+      parameters:
+        - name: id
+          in: path
+          description: Company id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Company Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Company"
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/Forbidden"
+        '404':
+          description: Company not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/NotFound"
+    delete:
+      tags:
+        - Companies
+      summary: Delete Company
+      description: Delete a Company
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Company id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Company Deleted
           content:
             application/json:
               schema:
@@ -203,6 +278,21 @@ components:
         name:
           type: string
           description: Company name
+    User:
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User id
+        first_name:
+          type: string
+          description: User first name
+        last_name:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email
     Health:
       properties:
         message:
