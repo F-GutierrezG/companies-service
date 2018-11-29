@@ -24,14 +24,22 @@ class CompanyLogics:
             company_id=company.id).first()
         return user_company is not None
 
-    def get(self, user, id):
+    def __get(self, id):
         company = Company.query.filter_by(id=id, active=True).first()
 
         if company is None:
             raise NotFound
 
+        return company
+
+    def __check_modify_company_permission(self, user, company):
         if not user.admin and not self.__belongs_to_company(user, company):
             raise Forbidden
+
+    def get(self, user, id):
+        company = self.__get(id)
+
+        self.__check_modify_company_permission(user, company)
 
         return CompanySerializer.to_dict(company)
 
@@ -58,15 +66,27 @@ class CompanyLogics:
 
     @validate(CompanyValidator)
     def update(self, user, id, data):
-        company = Company.query.filter_by(id=id, active=True).first()
-        if not user.admin and not self.__belongs_to_company(user, company):
-            raise Forbidden
+        company = self.__get(id)
+
+        self.__check_modify_company_permission(user, company)
 
         data['updated_by'] = user.id
         Company.query.filter_by(id=id, active=True).update(data)
         db.session.commit()
 
         return self.get(user, id)
+
+    def delete(self, user, id):
+        company = self.__get(id)
+
+        self.__check_modify_company_permission(user, company)
+
+        company.updated_by = user.id
+        company.active = False
+        db.session.add(company)
+        db.session.commit()
+
+        return company
 
 
 class UserLogics:

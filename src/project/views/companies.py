@@ -86,3 +86,15 @@ def update(user, id):
         return failed_response('forbidden.', 403)
     except ValidatorException as e:
         return failed_response('invalid payload.', 400, e.errors)
+
+
+@companies_blueprint.route('/companies/<id>', methods=['DELETE'])
+@authenticate
+def delete(user, id):
+    try:
+        CompanyLogics().delete(user, id)
+        return success_response(status_code=204)
+    except NotFound:
+        return failed_response('not found.', 404)
+    except Forbidden:
+        return failed_response('forbidden.', 403)

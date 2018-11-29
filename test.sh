@@ -3,11 +3,11 @@
 type=$1
 
 watchTests() {
-  docker-compose -f docker-compose-dev.yml run companies ptw -cn --runner "python manage.py test"
+  docker container exec companies ptw -cn --runner "python manage.py test"
 }
 
 test() {
-  docker-compose -f docker-compose-dev.yml run companies python manage.py test
+  docker container exec companies python manage.py test
 }
 
 if [[ "${type}" == "watch" ]]; then
