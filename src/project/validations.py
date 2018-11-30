@@ -15,11 +15,3 @@ class CompanyValidator(BaseValidator):
                 rules.Length(max=Company.NAME_MAX_LENGTH)
             ]
         }
-
-
-class LoginValidator(BaseValidator):
-    def get_rules(self):
-        return {
-            'email': [rules.Required()],
-            'password': [rules.Required()]
-        }
