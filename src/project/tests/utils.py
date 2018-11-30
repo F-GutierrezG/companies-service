@@ -22,7 +22,8 @@ def add_user(admin=False):
         'first_name': random_string(),
         'last_name': random_string(),
         'email': '{}@test.com'.format(random_string),
-        'admin': admin
+        'admin': admin,
+        'hash': random_string(32)
     }
     users_service.add_user(user)
     return user

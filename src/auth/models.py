@@ -5,3 +5,4 @@ class User:
         self.last_name = data['last_name']
         self.email = data['email']
         self.admin = False if 'admin' not in data else data['admin']
+        self.hash = data['hash']

@@ -41,7 +41,9 @@ class TestListCompanies(BaseCompanyTestCase):
             'id': user_id,
             'first_name': random_string(16),
             'last_name': random_string(16),
-            'email': '{}@test.com'.format(random_string(16))
+            'email': '{}@test.com'.format(random_string(16)),
+            'admin': False,
+            'hash': random_string(32)
         })
 
     def test_user_companies(self):
