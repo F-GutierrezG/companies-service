@@ -468,6 +468,30 @@ class TestUpdateCompany(BaseTestCase):
             self.assertIsNotNone(company.name)
             self.assertIsNotNone(company.identifier)
 
+    def test_update_a_non_existing_company(self):
+        """Test update a non existing company"""
+        auth = AuthenticatorFactory.get_instance().clear()
+        admin = add_user(admin=True)
+        auth.set_user(admin)
+
+        data = {
+            'identifier': random_string(),
+            'name': random_string()
+        }
+
+        self.assertEqual(Company.query.count(), 0)
+
+        with self.client:
+            response = self.client.put(
+                '/companies/{}'.format(random.randint(10, 100)),
+                headers={'Authorization': 'Bearer {}'.format(random_string())},
+                data=json.dumps(data),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(Company.query.count(), 0)
+
 
 class TestDeleteCompany(BaseTestCase):
     """Deleting Company Tests"""
