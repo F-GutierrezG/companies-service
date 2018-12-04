@@ -35,6 +35,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    restart: always
     networks:
       - companies-service-network
 
@@ -49,6 +50,7 @@ services:
       - './swagger/definitions:/usr/share/nginx/html/definitions'
     environment:
       - API_URL=definitions/swagger.yml
+    restart: always
     networks:
       - companies-service-network
       - onelike-network
