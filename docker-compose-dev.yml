@@ -18,6 +18,7 @@ services:
       - DATABASE_TEST_URL=postgres://postgres:postgres@companies-db:5432/companies_test
       - SECRET_KEY=secret_key
       - USERS_SERVICE_URL=http://users:5000
+    restart: always
     depends_on:
       - companies-db
     networks:
