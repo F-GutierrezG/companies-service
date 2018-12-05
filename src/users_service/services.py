@@ -6,7 +6,7 @@ from flask import request, current_app
 
 class UsersService:
     def filter_by_ids(self, ids=[]):
-        url = '{0}/users/{1}'.format(
+        url = '{0}/{1}'.format(
             current_app.config['USERS_SERVICE_URL'], ','.join(ids))
         bearer = request.headers.get('Authorization')
         headers = {'Authorization': bearer}
@@ -15,7 +15,7 @@ class UsersService:
         return response, data
 
     def get_admin_users(self):
-        url = '{0}/users/admins'.format(
+        url = '{0}/admins'.format(
             current_app.config['USERS_SERVICE_URL'])
         bearer = request.headers.get('Authorization')
         headers = {'Authorization': bearer}
