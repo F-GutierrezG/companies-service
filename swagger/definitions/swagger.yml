@@ -5,7 +5,7 @@ info:
   description: Companies Service API documentation
 servers:
   - url: http://localhost:5002
-  - url: http://stage.onelike.gusisoft.cl
+  - url: https://stage.onelike.gusisoft.cl
 tags:
   - name: Companies
     description: Companies Operations
