@@ -5,6 +5,9 @@ class CompanySerializer:
             'id': company.id,
             'identifier': company.identifier,
             'name': company.name,
+            'classification': company.classification.name,
+            'expiration':
+                str(company.expiration) if company.expiration else None
         }
 
     @staticmethod

@@ -5,7 +5,8 @@ import unittest
 from auth.factories import AuthenticatorFactory
 from users_service.factories import UsersServiceFactory
 
-from project.tests.utils import random_string, add_user, add_company
+from project.tests.utils import (
+    random_string, add_user, add_company, add_classification)
 
 from project import db
 from project.models import UserCompanies
@@ -58,7 +59,7 @@ class TestListUsers(BaseTestCase):
         admin = add_user(admin=True)
         authenticator.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         users_quantity = random.randint(4, 10)
 
@@ -85,7 +86,7 @@ class TestListUsers(BaseTestCase):
         admin = add_user(admin=True)
         authenticator.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         users_quantity = random.randint(4, 10)
 
@@ -112,7 +113,7 @@ class TestListUsers(BaseTestCase):
         current_user = add_user()
         authenticator.set_user(current_user)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         self._add_user_to_company(current_user, company)
 
@@ -141,7 +142,7 @@ class TestListUsers(BaseTestCase):
         current_user = add_user()
         authenticator.set_user(current_user)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         users_quantity = random.randint(4, 10)
 

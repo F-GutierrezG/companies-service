@@ -2,6 +2,17 @@ from sqlalchemy.sql import func
 from project import db
 
 
+class Classification(db.Model):
+    NAME_MAX_LENGTH = 128
+
+    __tablename__ = 'classification'
+    __table_args__ = {'schema': 'companies'}
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False)
+    companies = db.relationship('Company', back_populates='classification')
+
+
 class Company(db.Model):
     NAME_MAX_LENGTH = 128
     IDENTIFIER_MAX_LENGTH = 128
@@ -13,6 +24,11 @@ class Company(db.Model):
     identifier = db.Column(db.String(IDENTIFIER_MAX_LENGTH), nullable=False)
     name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
+    classification_id = db.Column(
+        db.Integer, db.ForeignKey(Classification.id), nullable=False)
+    classification = db.relationship(
+        'Classification', back_populates='companies')
+    expiration = db.Column(db.DateTime, nullable=True)
     created = db.Column(db.DateTime, default=func.now(), nullable=False)
     created_by = db.Column(db.Integer, default=0, nullable=False)
     updated = db.Column(db.DateTime, onupdate=func.now(), nullable=True)

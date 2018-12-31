@@ -267,17 +267,31 @@ paths:
 components:
   schemas:
     Company:
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Company id
-        identifier:
-          type: string
-          description: Company national identifier
-        name:
-          type: string
-          description: Company name
+      allOf:
+        - $ref: "#/components/requestBodies/CompanyBase"
+        - optional:
+          properties:
+            id:
+              type: integer
+              format: int64
+              description: Company id
+            classification:
+              type: string
+              description: Company Classification
+            created:
+              type: string
+              format: date-time
+              description: Created datetime
+            created_by:
+              type: integer
+              description: User id who creates this
+            updated:
+              type: string
+              format: date-time
+              description: Updated datetime
+            updated_by:
+              type: integer
+              description: User id who updates this
     User:
       properties:
         id:
@@ -300,6 +314,16 @@ components:
           description: Health status
   requestBodies:
     CompanyCreate:
+      allOf:
+        - $ref: "#/components/requestBodies/CompanyBase"
+        - required:
+          - name
+          properties:
+            classification_id:
+              type: integer
+              format: int64
+              description: Classification id
+    CompanyBase:
       properties:
         identifier:
           type: string
@@ -307,6 +331,10 @@ components:
         name:
           type: string
           description: Company name
+        expiration:
+          type: string
+          format: date-time
+          description: Expiration datetime
   responses:
     BadRequest:
       properties:

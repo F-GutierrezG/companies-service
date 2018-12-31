@@ -4,7 +4,7 @@ import string
 from users_service.factories import UsersServiceFactory
 
 from project import db
-from project.models import Company, UserCompanies
+from project.models import Company, UserCompanies, Classification
 
 
 def random_string(length=32):
@@ -29,10 +29,21 @@ def add_user(admin=False):
     return user
 
 
-def add_company():
+def add_classification():
+    classification = Classification(
+        name=random_string())
+
+    db.session.add(classification)
+    db.session.commit()
+
+    return classification
+
+
+def add_company(classification):
     company = Company(
         identifier=random_string(),
-        name=random_string())
+        name=random_string(),
+        classification=classification)
 
     db.session.add(company)
     db.session.commit()

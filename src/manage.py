@@ -6,7 +6,7 @@ import coverage
 from flask.cli import FlaskGroup
 
 from project import create_app, db
-from project.models import Company, UserCompanies
+from project.models import Company, UserCompanies, Classification
 
 
 COV = coverage.coverage(
@@ -33,7 +33,9 @@ def recreate_db():
 
 @cli.command()
 def seed_db():
-    company = Company(identifier="1", name="Compañia 1")
+    classification = Classification(name='Construcción')
+    company = Company(
+        identifier="1", name="Compañia 1", classification=classification)
     company.users.append(UserCompanies(user_id=1))
     db.session.add(company)
     db.session.commit()

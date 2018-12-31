@@ -4,7 +4,8 @@ import unittest
 from auth.factories import AuthenticatorFactory
 
 from project.tests.utils import (
-    random_string, add_user, add_company, add_user_to_company)
+    random_string, add_user, add_company, add_user_to_company,
+    add_classification)
 
 from project import db
 from project.tests.base import BaseTestCase
@@ -15,7 +16,8 @@ class BaseCompanyTestCase(BaseTestCase):
     def _add_company(self, users):
         company = Company(
             identifier=random_string(),
-            name=random_string())
+            name=random_string(),
+            classification=add_classification())
         for user in users:
             company.users.append(UserCompanies(user_id=user))
         db.session.add(company)
@@ -78,7 +80,7 @@ class TestViewCompany(BaseTestCase):
 
     def test_view_company_if_admin(self):
         """View a company as admin user"""
-        company = add_company()
+        company = add_company(add_classification())
 
         admin = add_user(admin=True)
         auth = AuthenticatorFactory.get_instance().clear()
@@ -94,7 +96,11 @@ class TestViewCompany(BaseTestCase):
 
             self.assertEqual(Company.query.count(), 1)
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(response_data['identifier'], company.identifier)
             self.assertEqual(response_data['name'], company.name)
+            self.assertEqual(
+                response_data['classification'], company.classification.name)
+            self.assertEqual(response_data['expiration'], company.expiration)
 
     def test_view_unexisting_company_if_admin(self):
         """View a company as admin user"""
@@ -114,7 +120,7 @@ class TestViewCompany(BaseTestCase):
 
     def test_view_company_if_user_belongs(self):
         """View a company as a company user"""
-        company = add_company()
+        company = add_company(add_classification())
         user = add_user()
         add_user_to_company(user, company)
 
@@ -135,7 +141,7 @@ class TestViewCompany(BaseTestCase):
 
     def test_view_company_if_user_not_belongs(self):
         """View a company as a not company user"""
-        company = add_company()
+        company = add_company(add_classification())
         user = add_user()
 
         auth = AuthenticatorFactory.get_instance().clear()
@@ -163,7 +169,8 @@ class TestCreateCompany(BaseTestCase):
 
         data = {
             'identifier': random_string(),
-            'name': random_string()
+            'name': random_string(),
+            'classification_id': add_classification().id
         }
 
         self.assertEqual(Company.query.count(), 0)
@@ -303,7 +310,7 @@ class TestUpdateCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         data = {
             'identifier': random_string(),
@@ -342,7 +349,7 @@ class TestUpdateCompany(BaseTestCase):
             'name': random_string()
         }
 
-        company = add_company()
+        company = add_company(add_classification())
 
         self.assertEqual(Company.query.count(), 1)
 
@@ -367,7 +374,7 @@ class TestUpdateCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         data = {
             'name': random_string()
@@ -396,7 +403,7 @@ class TestUpdateCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         data = {
             'identifier': random_string()
@@ -425,7 +432,7 @@ class TestUpdateCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         data = {}
 
@@ -452,7 +459,7 @@ class TestUpdateCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         self.assertEqual(Company.query.count(), 1)
 
@@ -504,7 +511,7 @@ class TestDeleteCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         self.assertEqual(Company.query.count(), 1)
         self.assertTrue(Company.query.first().active)
@@ -529,7 +536,7 @@ class TestDeleteCompany(BaseTestCase):
         user = add_user(admin=False)
         auth.set_user(user)
 
-        company = add_company()
+        company = add_company(add_classification())
 
         self.assertEqual(Company.query.count(), 1)
         self.assertTrue(Company.query.first().active)
@@ -569,7 +576,7 @@ class TestDeleteCompany(BaseTestCase):
         admin = add_user(admin=True)
         auth.set_user(admin)
 
-        company = add_company()
+        company = add_company(add_classification())
         company.active = False
 
         db.session.add(company)
