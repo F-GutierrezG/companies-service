@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy.sql import func
 from project import db
 
@@ -34,6 +36,16 @@ class Company(db.Model):
     updated = db.Column(db.DateTime, onupdate=func.now(), nullable=True)
     updated_by = db.Column(db.Integer)
     users = db.relationship("UserCompanies", backref='company')
+
+    @property
+    def status(self):
+        if self.active is False:
+            return False
+
+        if self.expiration is None:
+            return self.active
+
+        return datetime.datetime.now() < self.expiration
 
 
 class UserCompanies(db.Model):

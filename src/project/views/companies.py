@@ -3,7 +3,8 @@ from flask import Blueprint, request
 from auth.decorators import authenticate
 from validators.exceptions import ValidatorException
 
-from project.logics import CompanyLogics, UserLogics, NotFound, Forbidden
+from project.logics import (
+    CompanyLogics, UserLogics, NotFound, Forbidden)
 from project.views.utils import success_response, failed_response
 
 
@@ -88,13 +89,23 @@ def update(user, id):
         return failed_response('invalid payload.', 400, e.errors)
 
 
-@companies_blueprint.route('/companies/<id>', methods=['DELETE'])
+@companies_blueprint.route('/companies/<id>/deactivate', methods=['PUT'])
 @authenticate
-def delete(user, id):
+def deactivate(user, id):
     try:
-        CompanyLogics().delete(user, id)
-        return success_response(status_code=204)
+        company = CompanyLogics().deactivate(id, user)
+        return success_response(data=company, status_code=200)
+
     except NotFound:
-        return failed_response('not found.', 404)
-    except Forbidden:
-        return failed_response('forbidden.', 403)
+        return failed_response(message='not found.', status_code=404)
+
+
+@companies_blueprint.route('/companies/<id>/activate', methods=['PUT'])
+@authenticate
+def activate(user, id):
+    try:
+        company = CompanyLogics().activate(id, user)
+        return success_response(data=company, status_code=200)
+
+    except NotFound:
+        return failed_response(message='not found.', status_code=404)

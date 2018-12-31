@@ -76,17 +76,23 @@ class CompanyLogics:
 
         return self.get(user, id)
 
-    def delete(self, user, id):
-        company = self.__get(id)
-
-        self.__check_modify_company_permission(user, company)
-
-        company.updated_by = user.id
-        company.active = False
-        db.session.add(company)
+    def deactivate(self, id, updated_by):
+        Company.query.filter_by(id=id).update({
+            'active': False,
+            'updated_by': updated_by.id
+        })
         db.session.commit()
 
-        return company
+        return self.get(updated_by, id)
+
+    def activate(self, id, updated_by):
+        Company.query.filter_by(id=id).update({
+            'active': True,
+            'updated_by': updated_by.id
+        })
+        db.session.commit()
+
+        return self.get(updated_by, id)
 
 
 class UserLogics:
