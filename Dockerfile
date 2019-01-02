@@ -1,21 +1,17 @@
 FROM python:3.7.1-slim
 
 RUN apt-get update && \
-    apt-get -y install netcat && \
     apt-get clean
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 ARG USERS_SERVICE_URL
-ENV USERS_SERVICE_URL $STAGE_USERS_SERVICE_URL
+ENV USERS_SERVICE_URL $PROD_USERS_SERVICE_URL
 
 COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
 COPY ./src /usr/src/app
 
-COPY ./entrypoint.sh /usr/src/entrypoint.sh
-RUN chmod +x /usr/src/entrypoint.sh
-
-CMD ["/usr/src/entrypoint.sh"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "manage:app"]
