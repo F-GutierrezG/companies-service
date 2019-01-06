@@ -400,6 +400,8 @@ components:
         - $ref: "#/components/requestBodies/CompanyBase"
         - required:
           - name
+          - classification_id
+          - identifier
           properties:
             classification_id:
               type: integer
