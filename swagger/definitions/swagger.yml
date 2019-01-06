@@ -9,6 +9,8 @@ servers:
 tags:
   - name: Companies
     description: Companies Operations
+  - name: Classifications
+    description: Companies Classifications
   - name: Service Health
     description: Service Health Status
 paths:
@@ -300,6 +302,29 @@ paths:
             application/json:
               schema:
                 $ref: "#components/responses/NotFound"
+  /companies/classifications:
+    get:
+      tags:
+        - Classifications
+      summary: List Classifications
+      description: List Classifications for companies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Classification List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Classification"
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/Forbidden"
   /companies-service/health:
     get:
       tags:
@@ -314,6 +339,15 @@ paths:
                 $ref: "#/components/schemas/Health"
 components:
   schemas:
+    Classification:
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Classification id
+        name:
+          type: string
+          description: Classification name
     Company:
       allOf:
         - $ref: "#/components/requestBodies/CompanyBase"

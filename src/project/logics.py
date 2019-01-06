@@ -4,8 +4,8 @@ from users_service.factories import UsersServiceFactory
 from validators.decorators import validate
 
 from project.validations import CompanyValidator
-from project.models import Company, UserCompanies
-from project.serializers import CompanySerializer
+from project.models import Company, UserCompanies, Classification
+from project.serializers import CompanySerializer, ClassificationSerializer
 from project import db
 
 
@@ -138,3 +138,10 @@ class UserLogics:
             users_ids.append(user.user_id)
 
         return UsersServiceFactory.get_instance().filter_by_ids(users_ids)
+
+
+class ClassificationLogics:
+    def list(self):
+        classifications = Classification.query.all()
+
+        return ClassificationSerializer.to_array(classifications)

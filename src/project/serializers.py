@@ -13,9 +13,23 @@ class CompanySerializer:
 
     @staticmethod
     def to_array(companies):
-        companies_list = []
+        return list(
+            map(
+                lambda company: CompanySerializer.to_dict(
+                    company), companies))
 
-        for company in companies:
-            companies_list.append(CompanySerializer.to_dict(company))
 
-        return companies_list
+class ClassificationSerializer:
+    @staticmethod
+    def to_dict(classification):
+        return {
+            'id': classification.id,
+            'name': classification.name
+        }
+
+    @staticmethod
+    def to_array(classifications):
+        return list(
+            map(
+                lambda classification: ClassificationSerializer.to_dict(
+                    classification), classifications))
