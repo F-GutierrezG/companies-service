@@ -25,7 +25,7 @@ class CompanyLogics:
         return user_company is not None
 
     def __get(self, id):
-        company = Company.query.filter_by(id=id, active=True).first()
+        company = Company.query.filter_by(id=id).first()
 
         if company is None:
             raise NotFound
@@ -44,10 +44,14 @@ class CompanyLogics:
         return CompanySerializer.to_dict(company)
 
     def list_by_user(self, user):
-        companies = Company.query.join(Company.users, aliased=True)\
-                    .filter(
-                        UserCompanies.user_id == user.id,
-                        Company.active == true())
+        if user.admin:
+            companies = Company.query.order_by(Company.id.asc()).all()
+        else:
+            companies = Company.query.join(Company.users, aliased=True)\
+                        .filter(
+                            UserCompanies.user_id == user.id,
+                            Company.active == true())\
+                        .order_by(Company.id.asc())
 
         return CompanySerializer.to_array(companies)
 

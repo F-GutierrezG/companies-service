@@ -34,10 +34,12 @@ def recreate_db():
 @cli.command()
 def seed_db():
     classification = Classification(name='Construcción')
+    classification2 = Classification(name='Diseño')
     company = Company(
         identifier="1", name="Compañia 1", classification=classification)
     company.users.append(UserCompanies(user_id=1))
     db.session.add(company)
+    db.session.add(classification2)
     db.session.commit()
 
 
