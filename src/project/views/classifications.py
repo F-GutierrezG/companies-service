@@ -8,6 +8,7 @@ from project.logics import ClassificationLogics
 
 classifications_blueprint = Blueprint('classifications', __name__)
 
+
 @classifications_blueprint.route('/companies/classifications', methods=['GET'])
 @authenticate
 def list(user):

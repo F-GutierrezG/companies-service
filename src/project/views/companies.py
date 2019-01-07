@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 
-from auth.decorators import authenticate
+from auth.decorators import authenticate, authorize
 from validators.exceptions import ValidatorException
 
 from project.logics import (
@@ -12,7 +12,7 @@ companies_blueprint = Blueprint('companies', __name__)
 
 
 @companies_blueprint.route('/companies', methods=['GET'])
-@authenticate
+@authorize([])
 def list(user):
     companies = CompanyLogics().list_by_user(user)
     return success_response(

@@ -31,6 +31,12 @@ paths:
                 type: array
                 items:
                   $ref: "#components/schemas/Company"
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/responses/Unauthorized"
         '403':
           description: Forbidden.
           content:
@@ -431,6 +437,11 @@ components:
           type: string
           description: Error cause
     Forbidden:
+      properties:
+        message:
+          type: string
+          description: Error cause
+    Unauthorized:
       properties:
         message:
           type: string

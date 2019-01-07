@@ -7,6 +7,12 @@ def forbidden(message='forbidden'):
     return jsonify({'message': message}), 403
 
 
+def unauthorized(required_permissions):
+    return jsonify({
+        'message': 'unauthorized: the following permissions are required: {}'
+        .format(', '.join(required_permissions))}), 401
+
+
 class Authenticator:
     def authenticate(self, f, *args, **kwargs):
         token = self.__parse_token()
@@ -18,6 +24,23 @@ class Authenticator:
         if response.status_code == 200:
             user = User(data)
             return f(user, *args, **kwargs)
+        else:
+            return forbidden()
+
+    def authorize(self, required_permissions, f, *args, **kwargs):
+        token = self.__parse_token()
+
+        if token is False:
+            return forbidden()
+
+        response, data = self.__do_request(token)
+        if response.status_code == 200:
+            user = User(data)
+
+            if user.is_authorized(required_permissions):
+                return f(user, *args, **kwargs)
+            else:
+                return unauthorized(required_permissions)
         else:
             return forbidden()
 
@@ -58,6 +81,13 @@ class MockAuthenticator:
         if self.user is None:
             return forbidden()
         return f(self.user, *args, **kwargs)
+
+    def authorize(self, required_permissions, f, *args, **kwargs):
+        if self.user is None:
+            return forbidden()
+        if self.user.is_authorized(required_permissions):
+            return f(self.user, *args, **kwargs)
+        return unauthorized(required_permissions)
 
     def set_user(self, user_data):
         self.user = User(user_data)
