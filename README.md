@@ -1,4 +1,4 @@
-# Companies Service
+# Users Service
 You must choose the docker-compose file depending on the desired environment and replace the `%docker-file%` placeholders on the commands above
 ```
 Development: docker-compose-dev.yml
@@ -12,17 +12,17 @@ Service is now up on http://localhost:5002, you can check the service's health o
 
 ## Create Database
 ```
-docker-compose -f %docker-file% run companies python manage.py recreate-db
+docker container exec companies python manage.py recreate-db
 ```
 
 ## Lint
 ```
-docker-compose -f %docker-file% run companies flake8 project
+docker container exec companies flake8 project
 ```
 
 ## Run Test
 ```
-docker-compose -f %docker-file% run companies python manage.py test
+docker container exec companies python manage.py test
 ```
 or
 ```
@@ -36,30 +36,30 @@ or
 
 ## Run a specific test file
 ```
-docker-compose -f %docker-file% run companies python manage.py test --file=health_test
+docker container exec companies python manage.py test --file=health_test
 ```
 
 ## Run Code Coverage
 ```
-docker-compose -f %docker-file% run companies python manage.py cov
+docker container exec companies python manage.py cov
 ```
 
 ## Run Shell
 ```
-docker-compose -f %docker-file% run companies python flask shell
+docker container exec companies python flask shell
 ```
 
 ## Create new DB Migrations
 ```
-docker-compose -f %docker-file% run companies python manage.py db migrate
+docker container exec companies python manage.py db migrate
 ```
 
 ## Apply DB Migrations
 ```
-docker-compose -f %docker-file% run companies python manage.py db upgrade
+docker container exec companies python manage.py db upgrade
 ```
 
 ## Init DB Migrations (Only new projects)
 ```
-docker-compose -f %docker-file% run companies python manage.py db init
+docker container exec companies python manage.py db init
 ```
