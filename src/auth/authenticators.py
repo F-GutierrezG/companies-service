@@ -15,17 +15,7 @@ def unauthorized(required_permissions):
 
 class Authenticator:
     def authenticate(self, f, *args, **kwargs):
-        token = self.__parse_token()
-
-        if token is False:
-            return forbidden()
-
-        response, data = self.__do_request(token)
-        if response.status_code == 200:
-            user = User(data)
-            return f(user, *args, **kwargs)
-        else:
-            return forbidden()
+        return self.authorize([], f, *args, **kwargs)
 
     def authorize(self, required_permissions, f, *args, **kwargs):
         token = self.__parse_token()
@@ -61,7 +51,7 @@ class Authenticator:
         return token_parts[1]
 
 
-class MockAuthenticator:
+class MockAuthenticator(Authenticator):
     instance = None
 
     def __init__(self):
@@ -76,11 +66,6 @@ class MockAuthenticator:
     def clear(self):
         self.user = None
         return self
-
-    def authenticate(self, f, *args, **kwargs):
-        if self.user is None:
-            return forbidden()
-        return f(self.user, *args, **kwargs)
 
     def authorize(self, required_permissions, f, *args, **kwargs):
         if self.user is None:
