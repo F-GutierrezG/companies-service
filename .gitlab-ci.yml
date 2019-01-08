@@ -25,6 +25,9 @@ Testing:
     - docker-compose -f docker-compose-dev.yml run companies python manage.py cov
   after_script:
     - docker-compose -f docker-compose-dev.yml down
+    - docker image rm -f companies-service_companies
+    - docker image rm -f companies-service_companies-db
+    - docker image rm -f companies-service_companies-swagger
     - sudo git clean -ffdx
 
 Companies Service:
