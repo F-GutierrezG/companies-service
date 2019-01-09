@@ -6,8 +6,9 @@ from flask import request, current_app
 
 class UsersService:
     def filter_by_ids(self, ids=[]):
-        url = '{0}/{1}'.format(
-            current_app.config['USERS_SERVICE_URL'], ','.join(ids))
+        url = '{0}/byIds/{1}'.format(
+            current_app.config['USERS_SERVICE_URL'],
+            ','.join(str(v) for v in ids))
         bearer = request.headers.get('Authorization')
         headers = {'Authorization': bearer}
         response = requests.get(url, headers=headers)
@@ -22,6 +23,10 @@ class UsersService:
         response = requests.get(url, headers=headers)
         data = json.loads(response.text)
         return response, data
+
+
+class Response:
+    status_code = 200
 
 
 class UsersServiceMock:
@@ -50,11 +55,11 @@ class UsersServiceMock:
         for user in self.users:
             if user['id'] in ids:
                 users.append(user)
-        return users
+        return Response(), users
 
     def get_admin_users(self):
         users = []
         for user in self.users:
             if user['admin']:
                 users.append(user)
-        return users
+        return Response(), users

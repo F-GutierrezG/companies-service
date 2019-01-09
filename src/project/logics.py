@@ -120,10 +120,10 @@ class UserLogics:
         users_service = UsersServiceFactory.get_instance()
 
         if user.admin:
-            users = users_service.get_admin_users()
+            _, users = users_service.get_admin_users()
         else:
             users_ids = self._get_same_company_users_ids(user)
-            users = users_service.filter_by_ids(ids=users_ids)
+            _, users = users_service.filter_by_ids(ids=users_ids)
 
         return users
 
@@ -137,7 +137,9 @@ class UserLogics:
         for user in company.users:
             users_ids.append(user.user_id)
 
-        return UsersServiceFactory.get_instance().filter_by_ids(users_ids)
+        _, users = UsersServiceFactory.get_instance().filter_by_ids(users_ids)
+
+        return users
 
 
 class ClassificationLogics:
