@@ -17,6 +17,15 @@ class Forbidden(Exception):
     pass
 
 
+class InternalServerError(Exception):
+    pass
+
+
+class BadRequest(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class CompanyLogics:
     def __belongs_to_company(self, user, company):
         user_company = UserCompanies.query.filter_by(
@@ -137,9 +146,33 @@ class UserLogics:
         for user in company.users:
             users_ids.append(user.user_id)
 
+        if len(users_ids) == 0:
+            return []
+
         _, users = UsersServiceFactory.get_instance().filter_by_ids(users_ids)
 
         return users
+
+    def create_user_in_company(self, user_data, id, user):
+        # users service crear usuario
+        user_data['admin'] = False
+        response, user = UsersServiceFactory.get_instance().create_user(user_data)
+
+        if response.status_code == 201:
+            user_company = UserCompanies(user_id=user['id'], company_id=id)
+
+            db.session.add(user_company)
+            db.session.commit()
+
+            return user
+
+        if response.status_code == 400:
+            raise BadRequest(message=user['message'])
+
+        else:
+            raise InternalServerError()
+
+
 
 
 class ClassificationLogics:

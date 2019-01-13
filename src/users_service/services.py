@@ -24,6 +24,14 @@ class UsersService:
         data = json.loads(response.text)
         return response, data
 
+    def create_user(self, user_data):
+        url = '{0}'.format(current_app.config['USERS_SERVICE_URL'])
+        bearer = request.headers.get('Authorization')
+        headers = {'Authorization': bearer, 'Content-Type': 'application/json'}
+        response = requests.post(
+            url, headers=headers, data=json.dumps(user_data))
+        data = json.loads(response.text)
+        return response, data
 
 class Response:
     status_code = 200

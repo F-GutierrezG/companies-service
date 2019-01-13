@@ -4,7 +4,8 @@ from auth.decorators import authenticate, authorize
 from validators.exceptions import ValidatorException
 
 from project.logics import (
-    CompanyLogics, UserLogics, NotFound, Forbidden)
+    CompanyLogics, UserLogics, NotFound, Forbidden, BadRequest,
+    InternalServerError)
 from project.views.utils import success_response, failed_response
 
 
@@ -109,3 +110,17 @@ def activate(user, id):
 
     except NotFound:
         return failed_response(message='not found.', status_code=404)
+
+
+@companies_blueprint.route('/companies/<id>/users', methods=['POST'])
+@authenticate
+def create_user(user, id):
+    user_data = request.get_json()
+    try:
+        user = UserLogics().create_user_in_company(user_data, id, user)
+
+        return success_response(data=user, status_code=201)
+    except BadRequest as e:
+        return failed_response(message=e.message, status_code=400)
+    except InternalServerError:
+        return failed_response(message="", status_code=500)
