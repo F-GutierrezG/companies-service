@@ -5,7 +5,10 @@ class CompanySerializer:
             'id': company.id,
             'identifier': company.identifier,
             'name': company.name,
-            'classification': company.classification.name,
+            'classification': {
+                'id': company.classification.id,
+                'name': company.classification.name
+            },
             'expiration':
                 str(company.expiration) if company.expiration else None,
             'active': company.status,

@@ -364,8 +364,16 @@ components:
               format: int64
               description: Company id
             classification:
-              type: string
+              type: object
               description: Company Classification
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                  description: Classification id
+                name:
+                  type: string
+                  description: Classification name
             created:
               type: string
               format: date-time
