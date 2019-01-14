@@ -99,7 +99,8 @@ class TestViewCompany(BaseTestCase):
             self.assertEqual(response_data['identifier'], company.identifier)
             self.assertEqual(response_data['name'], company.name)
             self.assertEqual(
-                response_data['classification'], company.classification.name)
+                response_data['classification']['name'],
+                company.classification.name)
             self.assertEqual(response_data['expiration'], company.expiration)
 
     def test_view_unexisting_company_if_admin(self):
