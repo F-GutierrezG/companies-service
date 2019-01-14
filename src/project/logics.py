@@ -156,7 +156,8 @@ class UserLogics:
     def create_user_in_company(self, user_data, id, user):
         # users service crear usuario
         user_data['admin'] = False
-        response, user = UsersServiceFactory.get_instance().create_user(user_data)
+        response, user = UsersServiceFactory.get_instance().create_user(
+            user_data)
 
         if response.status_code == 201:
             user_company = UserCompanies(user_id=user['id'], company_id=id)
@@ -171,8 +172,6 @@ class UserLogics:
 
         else:
             raise InternalServerError()
-
-
 
 
 class ClassificationLogics:
