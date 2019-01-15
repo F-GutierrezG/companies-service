@@ -99,6 +99,7 @@ Deploy Stage:
   before_script:
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - export USERS_SERVICE_URL=${STAGE_USERS_SERVICE_URL}
     - rm -rf ~/.ssh
     - mkdir -p ~/.ssh
     - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -117,6 +118,7 @@ Deploy Production:
   before_script:
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - export USERS_SERVICE_URL=${PROD_USERS_SERVICE_URL}
     - rm -rf ~/.ssh
     - mkdir -p ~/.ssh
     - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
