@@ -33,6 +33,7 @@ class UsersService:
         data = json.loads(response.text)
         return response, data
 
+
 class Response:
     status_code = 200
 
