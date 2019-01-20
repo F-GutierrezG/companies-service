@@ -25,7 +25,7 @@ def upgrade():
     schema='companies'
     )
     op.add_column('companies', sa.Column('classification_id', sa.Integer(), nullable=False), schema='companies')
-    op.add_column('companies', sa.Column('expiration', sa.DateTime(), nullable=True), schema='companies')
+    op.add_column('companies', sa.Column('expiration', sa.Date(), nullable=True), schema='companies')
     op.create_foreign_key(None, 'companies', 'classification', ['classification_id'], ['id'], source_schema='companies', referent_schema='companies')
     # ### end Alembic commands ###
 

@@ -30,7 +30,7 @@ class Company(db.Model):
         db.Integer, db.ForeignKey(Classification.id), nullable=False)
     classification = db.relationship(
         'Classification', back_populates='companies')
-    expiration = db.Column(db.DateTime, nullable=True)
+    expiration = db.Column(db.Date, nullable=True)
     created = db.Column(db.DateTime, default=func.now(), nullable=False)
     created_by = db.Column(db.Integer, default=0, nullable=False)
     updated = db.Column(db.DateTime, onupdate=func.now(), nullable=True)
@@ -45,7 +45,7 @@ class Company(db.Model):
         if self.expiration is None:
             return self.active
 
-        return datetime.datetime.now() < self.expiration
+        return datetime.date.today() < self.expiration
 
 
 class UserCompanies(db.Model):
