@@ -82,7 +82,7 @@ def seed_db():
     db.session.commit()
 
     company = Company(
-        identifier="1", name="Compañia 1", classification=Classification.query.all().first())
+        identifier="1", name="Compañia 1", classification=Classification.query.first())
     company.users.append(UserCompanies(user_id=1))
 
     db.session.add(company)
