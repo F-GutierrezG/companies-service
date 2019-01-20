@@ -83,6 +83,9 @@ class CompanyLogics:
 
         self.__check_modify_company_permission(user, company)
 
+        if 'expiration' in data and data['expiration'].strip() == '':
+            data['expiration'] = None
+
         data['updated_by'] = user.id
         Company.query.filter_by(id=id, active=True).update(data)
         db.session.commit()
