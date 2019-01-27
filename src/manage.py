@@ -83,7 +83,8 @@ def seed_db():
 
     company = Company(
         identifier="1", name="Compañia 1", classification=Classification.query.first())
-    company.users.append(UserCompanies(user_id=1))
+    company.users.append(UserCompanies(user_id=2))
+    company.users.append(UserCompanies(user_id=3))
 
     db.session.add(company)
     db.session.commit()
