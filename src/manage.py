@@ -73,7 +73,6 @@ def seed_db():
     db.session.add(Classification(name='Servicios De Suministro De Comidas Por Contrato'))
     db.session.add(Classification(name='Servicios De Alojamiento'))
     db.session.add(Classification(name='Cuidados Personal'))
-    db.session.add(Classification(name='Prostitución'))
     db.session.add(Classification(name='Efectos Personales N.E.P'))
     db.session.add(Classification(name='Protección Social'))
     db.session.add(Classification(name='Seguros'))
