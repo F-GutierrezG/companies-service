@@ -83,7 +83,8 @@ class CompanyLogics:
 
         self.__check_modify_company_permission(user, company)
 
-        if 'expiration' in data and data['expiration'].strip() == '':
+        if 'expiration' in data and data['expiration'] is not None and \
+                data['expiration'].strip() == '':
             data['expiration'] = None
 
         data['updated_by'] = user.id

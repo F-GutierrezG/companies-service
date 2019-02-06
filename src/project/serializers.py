@@ -11,7 +11,7 @@ class CompanySerializer:
             },
             'expiration':
                 str(company.expiration) if company.expiration else None,
-            'active': company.active,
+            'active': company.status,
             'created': company.created,
             'created_by': company.created_by,
             'updated': company.updated,
