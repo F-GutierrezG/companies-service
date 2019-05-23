@@ -91,9 +91,6 @@ Companies Swagger:
 
 Deploy Stage:
   stage: deploy
-  environment:
-    name: stage
-    url: http://stage.onelike.gusisoft.cl
   only:
     - stage
   before_script:
@@ -110,9 +107,6 @@ Deploy Stage:
 
 Deploy Production:
   stage: deploy
-  environment:
-    name: production
-    url: http://onelike.gusisoft.cl
   only:
     - master
   before_script:
