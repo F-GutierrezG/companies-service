@@ -2,12 +2,9 @@ from flask import Blueprint, jsonify, request
 
 from auth.decorators import authenticate
 from validators.exceptions import ValidatorException
-from project.logics import BrandLogics
 from project.views.utils import success_response, failed_response
 
-from project.logics import (
-    BrandLogics, NotFound, Forbidden, BadRequest,
-    InternalServerError)
+from project.logics import (BrandLogics, NotFound, Forbidden)
 
 
 brands_blueprint = Blueprint('brands', __name__)
