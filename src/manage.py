@@ -6,7 +6,7 @@ import coverage
 from flask.cli import FlaskGroup
 
 from project import create_app, db
-from project.models import Company, UserCompanies, Classification
+from project.models import Company, UserCompanies, Classification, Plan
 
 
 COV = coverage.coverage(
@@ -78,10 +78,18 @@ def seed_db():
     db.session.add(Classification(name='Seguros'))
     db.session.add(Classification(name='Servicios Financieros N.C.P.'))
     db.session.add(Classification(name='Otros Servicios N.C.P.'))
+
+    db.session.add(Plan(name='Autocontrol'))
+    db.session.add(Plan(name='Silver'))
+    db.session.add(Plan(name='Gold'))
+    db.session.add(Plan(name='Diamond'))
     db.session.commit()
 
     company = Company(
-        identifier="1", name="Compañia 1", classification=Classification.query.first())
+        identifier="1",
+        name="Compañia 1",
+        classification=Classification.query.first(),
+        plan=Plan.query.first())
     company.users.append(UserCompanies(user_id=2))
     company.users.append(UserCompanies(user_id=3))
 

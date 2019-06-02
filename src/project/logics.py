@@ -3,9 +3,11 @@ from sqlalchemy.sql.expression import true
 from users_service.factories import UsersServiceFactory
 from validators.decorators import validate
 
-from project.validations import CompanyValidator
-from project.models import Company, UserCompanies, Classification
-from project.serializers import CompanySerializer, ClassificationSerializer
+from project.validations import CompanyValidator, BrandValidator
+from project.models import Company, UserCompanies, Classification, Plan, Brand
+from project.serializers import (
+    CompanySerializer, ClassificationSerializer, PlanSerializer,
+    BrandSerializer)
 from project import db
 
 
@@ -183,3 +185,59 @@ class ClassificationLogics:
         classifications = Classification.query.all()
 
         return ClassificationSerializer.to_array(classifications)
+
+
+class PlanLogics:
+    def list(self):
+        plans = Plan.query.all()
+
+        return PlanSerializer.to_array(plans)
+
+
+class BrandLogics:
+    def get(self, id):
+        brand = Brand.query.filter_by(id=id).first()
+
+        return BrandSerializer.to_dict(brand)
+
+    def list(self, id):
+        brands = Brand.query.filter_by(company_id=id)
+
+        return BrandSerializer.to_array(brands)
+
+    @validate(BrandValidator)
+    def create(self, user, id, data):
+        data['created_by'] = user.id
+        data['company_id'] = id
+        brand = Brand(**data)
+
+        db.session.add(brand)
+        db.session.commit()
+
+        return BrandSerializer.to_dict(brand)
+
+    def deactivate(self, updated_by, id):
+        Brand.query.filter_by(id=id).update({
+            'active': False,
+            'updated_by': updated_by.id
+        })
+        db.session.commit()
+
+        return self.get(id)
+
+    def activate(self, updated_by, id):
+        Brand.query.filter_by(id=id).update({
+            'active': True,
+            'updated_by': updated_by.id
+        })
+        db.session.commit()
+
+        return self.get(id)
+
+    @validate(BrandValidator)
+    def update(self, user, id, data):
+        data['updated_by'] = user.id
+        Brand.query.filter_by(id=id, active=True).update(data)
+        db.session.commit()
+
+        return self.get(id)

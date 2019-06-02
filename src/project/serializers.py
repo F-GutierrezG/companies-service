@@ -9,6 +9,10 @@ class CompanySerializer:
                 'id': company.classification.id,
                 'name': company.classification.name
             },
+            'plan': {
+                'id': company.plan.id,
+                'name': company.plan.name
+            },
             'expiration':
                 str(company.expiration) if company.expiration else None,
             'active': company.status,
@@ -40,3 +44,40 @@ class ClassificationSerializer:
             map(
                 lambda classification: ClassificationSerializer.to_dict(
                     classification), classifications))
+
+
+class PlanSerializer:
+    @staticmethod
+    def to_dict(plan):
+        return {
+            'id': plan.id,
+            'name': plan.name
+        }
+
+    @staticmethod
+    def to_array(plans):
+        return list(
+            map(
+                lambda plan: PlanSerializer.to_dict(
+                    plan), plans))
+
+
+class BrandSerializer:
+    @staticmethod
+    def to_dict(brand):
+        return {
+            'id': brand.id,
+            'name': brand.name,
+            'active': brand.active,
+            'created': brand.created,
+            'created_by': brand.created_by,
+            'updated': brand.updated,
+            'updated_by': brand.updated_by,
+        }
+
+    @staticmethod
+    def to_array(brands):
+        return list(
+            map(
+                lambda brand: BrandSerializer.to_dict(
+                    brand), brands))

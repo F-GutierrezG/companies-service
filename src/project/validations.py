@@ -15,3 +15,13 @@ class CompanyValidator(BaseValidator):
                 rules.Length(max=Company.NAME_MAX_LENGTH)
             ]
         }
+
+
+class BrandValidator(BaseValidator):
+    def get_rules(self):
+        return {
+            'name': [
+                rules.Required(),
+                rules.Length(max=Company.NAME_MAX_LENGTH)
+            ]
+        }
