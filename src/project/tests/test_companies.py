@@ -5,7 +5,7 @@ from auth.factories import AuthenticatorFactory
 
 from project.tests.utils import (
     random_string, add_user, add_company, add_user_to_company,
-    add_classification)
+    add_classification, add_plan)
 
 from project import db
 from project.tests.base import BaseTestCase
@@ -17,7 +17,8 @@ class BaseCompanyTestCase(BaseTestCase):
         company = Company(
             identifier=random_string(),
             name=random_string(),
-            classification=add_classification())
+            classification=add_classification(),
+            plan=add_plan())
         for user in users:
             company.users.append(UserCompanies(user_id=user))
         db.session.add(company)
@@ -171,7 +172,8 @@ class TestCreateCompany(BaseTestCase):
         data = {
             'identifier': random_string(),
             'name': random_string(),
-            'classification_id': add_classification().id
+            'classification_id': add_classification().id,
+            'plan_id': add_plan().id
         }
 
         self.assertEqual(Company.query.count(), 0)
