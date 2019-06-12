@@ -51,6 +51,7 @@ class Company(db.Model):
     updated = db.Column(db.DateTime, onupdate=func.now(), nullable=True)
     updated_by = db.Column(db.Integer)
     users = db.relationship("UserCompanies", backref='company')
+    brands = db.relationship("Brand", backref='company')
 
     @property
     def status(self):

@@ -18,6 +18,14 @@ def brands(user, id):
     return jsonify(brands), 200
 
 
+@brands_blueprint.route('/companies/brands/<id>', methods=['GET'])
+@authenticate
+def brand(user, id):
+    brand = BrandLogics().get(id)
+
+    return jsonify(brand), 200
+
+
 @brands_blueprint.route('/companies/<id>/brands', methods=['POST'])
 @authenticate
 def create(user, id):
