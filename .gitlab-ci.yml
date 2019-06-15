@@ -1,7 +1,8 @@
-image: alpine
+image: docker
+services:
+  - docker:dind
 
 variables:
-  COMMIT: ${CI_COMMIT_SHA}
   REGISTRY_REPO: registry.gitlab.com/gusisoft/onelike/companies-service
   COMPANIES: companies
   COMPANIES_DB: companies-db
@@ -17,7 +18,8 @@ Testing:
   only:
     - devel
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+    - pip install docker-compose
   script:
     - docker-compose -f docker-compose-dev.yml up -d --build
     - docker-compose -f docker-compose-dev.yml run companies python manage.py recreate-db
@@ -25,10 +27,6 @@ Testing:
     - docker-compose -f docker-compose-dev.yml run companies python manage.py cov
   after_script:
     - docker-compose -f docker-compose-dev.yml down
-    - docker image rm -f companies-service_companies
-    - docker image rm -f companies-service_companies-db
-    - docker image rm -f companies-service_companies-swagger
-    - sudo git clean -ffdx
 
 Companies Service:
   stage: registry
@@ -36,38 +34,36 @@ Companies Service:
     - stage
     - master
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
     - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/companies-service.git"
     - export COMPANIES_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}"
   script:
-    - docker build $COMPANIES_REPO -t $COMPANIES:$COMMIT -f Dockerfile-${CI_COMMIT_REF_NAME}
-    - docker tag $COMPANIES:$COMMIT $REGISTRY_REPO/$COMPANIES:$TAG
+    - docker build $COMPANIES_REPO -t $COMPANIES:$CI_COMMIT_SHA -f Dockerfile-${CI_COMMIT_REF_NAME}
+    - docker tag $COMPANIES:$CI_COMMIT_SHA $REGISTRY_REPO/$COMPANIES:$TAG
     - docker push $REGISTRY_REPO/$COMPANIES:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/companies-service/companies -q)
-    - sudo git clean -ffdx
 
 Companies DB:
   stage: registry
   only:
     - stage
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
     - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/companies-service.git"
     - export COMPANIES_DB_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}:db"
   script:
-    - docker build $COMPANIES_DB_REPO -t $COMPANIES_DB:$COMMIT -f Dockerfile
-    - docker tag $COMPANIES_DB:$COMMIT $REGISTRY_REPO/$COMPANIES_DB:$TAG
+    - docker build $COMPANIES_DB_REPO -t $COMPANIES_DB:$CI_COMMIT_SHA -f Dockerfile
+    - docker tag $COMPANIES_DB:$CI_COMMIT_SHA $REGISTRY_REPO/$COMPANIES_DB:$TAG
     - docker push $REGISTRY_REPO/$COMPANIES_DB:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/companies-service/companies-db -q)
-    - sudo git clean -ffdx
 
 Companies Swagger:
   stage: registry
@@ -75,25 +71,25 @@ Companies Swagger:
     - stage
     - master
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
     - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/companies-service.git"
     - export SWAGGER_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}:swagger"
   script:
-    - docker build $SWAGGER_REPO -t $SWAGGER:$COMMIT -f Dockerfile
-    - docker tag $SWAGGER:$COMMIT $REGISTRY_REPO/$SWAGGER:$TAG
+    - docker build $SWAGGER_REPO -t $SWAGGER:$CI_COMMIT_SHA -f Dockerfile
+    - docker tag $SWAGGER:$CI_COMMIT_SHA $REGISTRY_REPO/$SWAGGER:$TAG
     - docker push $REGISTRY_REPO/$SWAGGER:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/companies-service/companies-swagger -q)
-    - sudo git clean -ffdx
 
 Deploy Stage:
   stage: deploy
   only:
     - stage
   before_script:
+    - apk add --no-cache openssh-client git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - export USERS_SERVICE_URL=${STAGE_USERS_SERVICE_URL}
@@ -103,13 +99,14 @@ Deploy Stage:
     - chmod 600 ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh
+    - sh ./${CI_COMMIT_REF_NAME}-deploy.sh
 
 Deploy Production:
   stage: deploy
   only:
     - master
   before_script:
+    - apk add --no-cache openssh-client git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - export USERS_SERVICE_URL=${PROD_USERS_SERVICE_URL}
@@ -120,4 +117,4 @@ Deploy Production:
     - chmod 600 ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh
+    - sh ./${CI_COMMIT_REF_NAME}-deploy.sh
